@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.infinitelearning_arfa.R
 import com.example.infinitelearning_arfa.Routes
+import com.example.infinitelearning_arfa.items.Item
 import com.example.infinitelearning_arfa.items.itemList
 
 val Poppins = FontFamily(
@@ -37,10 +40,52 @@ fun MainScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    // Add state for search query
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Add state for filtered items
+    val filteredItems by remember(searchQuery) {
+        derivedStateOf {
+            if (searchQuery.isBlank()) {
+                itemList
+            } else {
+                itemList.filter {
+                    it.name.contains(searchQuery, ignoreCase = true)
+                }
+            }
+        }
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-        // Section untuk LazyRow (Popular Now)
+        item {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholder = { Text("Search character name...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search"
+                    )
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = Color.Gray,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                ),
+                singleLine = true
+            )
+        }
+
+        // Popular Now section
         item {
             Column {
                 Text(
@@ -53,7 +98,7 @@ fun MainScreen(
                 LazyRow(
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    itemsIndexed(itemList) { index, item ->
+                    itemsIndexed(filteredItems) { index, item ->
                         ItemCard(
                             navController = navController,
                             painterId = item.imageId,
@@ -66,7 +111,7 @@ fun MainScreen(
             }
         }
 
-        // Section untuk LazyColumn (All Items)
+        // Hot News section header
         item {
             Text(
                 text = "Hot News - Lord Baron",
@@ -77,8 +122,8 @@ fun MainScreen(
             )
         }
 
-        // Items untuk LazyColumn
-        itemsIndexed(itemList) { index, item ->
+        // Items in vertical list
+        itemsIndexed(filteredItems) { index, item ->
             ItemCard(
                 navController = navController,
                 painterId = item.imageId,
@@ -90,7 +135,6 @@ fun MainScreen(
         }
     }
 }
-
 @Composable
 fun ItemCard(
     navController: NavController,
@@ -110,6 +154,9 @@ fun ItemCard(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     }
 
+    // Cari index asli dari item berdasarkan nama
+    val originalIndex = itemList.indexOfFirst { it.name == title }
+
     Column(
         modifier = cardModifier
     ) {
@@ -118,7 +165,7 @@ fun ItemCard(
                 .height(150.dp)
                 .fillMaxWidth()
                 .clickable {
-                    navController.navigate(Routes.createDetailRoute(index))
+                    navController.navigate(Routes.createDetailRoute(originalIndex))
                 },
         ) {
             Image(
@@ -134,7 +181,7 @@ fun ItemCard(
                 .height(80.dp)
                 .padding(bottom = 8.dp)
                 .clickable {
-                    navController.navigate(Routes.createDetailRoute(index))
+                    navController.navigate(Routes.createDetailRoute(originalIndex))
                 },
             shape = RectangleShape,
             colors = CardDefaults.cardColors(containerColor = Color.Transparent)

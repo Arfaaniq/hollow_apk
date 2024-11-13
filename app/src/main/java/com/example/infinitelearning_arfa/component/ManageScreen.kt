@@ -42,11 +42,11 @@ fun ManageScreen(
         modifier = modifier.fillMaxSize()
     ) {
         Text(
-            text = "Popular now",
+            text = "Biodata and Personality",
             fontFamily = Poppins,
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 28.dp, top = 16.dp)
+            modifier = Modifier.padding(start = 22.dp, top = 16.dp)
         )
 
         LazyVerticalGrid(
