@@ -42,7 +42,7 @@ fun AboutSreen(navController: NavController) {
         }
 
         Text(
-            text = "Welcome to Anime Handsome Rankings!",
+            text = "Welcome to Anime Biodata and Personality!",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
